@@ -36,7 +36,7 @@ jobs:
           chmod 600 deploy_key
           ssh -i deploy_key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             cd /var/www/vite-project  # Go to the directory where the app is stored
-            git pull origin main  # Pull the latest code
+            git pull origin master  # Pull the latest code
             npm install --production  # Install production dependencies
             npm run build  # Build the app
             pm2 restart all  # Restart the app using PM2
