@@ -4,7 +4,9 @@ on:
   push:
     branches:
       - master  # This can be any branch you want to trigger on
-
+  pull_request:
+    branches:
+      - master
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,15 +31,13 @@ jobs:
         run: npm run build
 
       # Step 5: Deploy to a server or cloud service
-      - name: Deploy to Server
+      - name: Deploy to AWS EC2
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          HOST: ${{ secrets.SSH_HOST }}
+          USER: ubuntu
         run: |
-          # SSH into the server and deploy (Example with EC2)
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > deploy_key
-          chmod 600 deploy_key
-          ssh -i deploy_key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            cd /var/www/vite-project  # Go to the directory where the app is stored
-            git pull origin master  # Pull the latest code
-            npm install --production  # Install production dependencies
-            npm run build  # Build the app
-            pm2 restart all  # Restart the app using PM2
-          EOF
+          echo "$PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          scp -i private_key.pem -r dist/* $USER@$HOST:/var/www/vite-project
+          ssh -i private_key.pem $USER@$HOST "sudo systemctl restart nginx"
