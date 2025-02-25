@@ -31,13 +31,13 @@ jobs:
         run: npm run build
 
       # Step 5: Deploy to a server or cloud service
-      # - name: Deploy to AWS EC2
-      #   env:
-      #     PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     HOST: ${{ secrets.SSH_HOST }}
-      #     USER: ubuntu
-      #   run: |
-      #     echo "$PRIVATE_KEY" > private_key.pem
-      #     chmod 600 private_key.pem
-      #     scp -i private_key.pem -r dist/* $USER@$HOST:/var/www/vite-project
-      #     ssh -i private_key.pem $USER@$HOST "sudo systemctl restart nginx"
+      - name: Deploy to AWS EC2
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          HOST: ${{ secrets.SSH_HOST }}
+          USER: ubuntu
+        run: |
+          echo "$PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          scp -i private_key.pem -r dist/* $USER@$HOST:/var/www/vite-project
+          ssh -i private_key.pem $USER@$HOST "sudo systemctl restart nginx"
